@@ -1,4 +1,6 @@
-FROM: https://github.com/shanselman/PowerPointToOBSSceneSwitcher
+Orginal idea from: https://github.com/shanselman/PowerPointToOBSSceneSwitcher
+
+See this in action: [Video](https://web.microsoftstream.com/video/c3f4e61f-b595-4c74-8dcf-e37e92231fbf)
 
 A .NET core based scene switcher than connects to OBS and changes scenes based note meta data. Put *"OBS:[Your-Scene-Name]"* on its own line in your notes and ensure the OBS Web Sockets Server is running and this app will change your scene as you change your PowerPoint slides.
 
