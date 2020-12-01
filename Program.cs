@@ -24,36 +24,35 @@ namespace obscontrol
             // OBS.StopRecording();
             // Console.WriteLine("Done...");
 
-             Console.Write("Connecting to PowerPoint...");
+            Console.Write("Connecting to PowerPoint...");
             ppt.SlideShowNextSlide += App_SlideShowNextSlide;
             Console.WriteLine("connected to powerpoint");
 
             Console.ReadLine();
         }
 
-        async static void App_SlideShowNextSlide(SlideShowWindow Wn)
+#pragma warning disable AsyncFixer03 // Fire & forget async void methods
+        private static async void App_SlideShowNextSlide(SlideShowWindow Wn)
+#pragma warning restore AsyncFixer03 // Fire & forget async void methods
         {
-            if (Wn != null)
-            {
-                Console.WriteLine($"Moved to Slide Number {Wn.View.Slide.SlideNumber}");
-                //Text starts at Index 2 ¯\_(ツ)_/¯
-                var note = String.Empty;
-                try { note = Wn.View.Slide.NotesPage.Shapes[2].TextFrame.TextRange.Text; }
-                catch { /*no notes*/ }
+            if (Wn == null) return;
+            Console.WriteLine($"Moved to Slide Number {Wn.View.Slide.SlideNumber}");
+            //Text starts at Index 2 ¯\_(ツ)_/¯
+            var note = string.Empty;
+            try { note = Wn.View.Slide.NotesPage.Shapes[2].TextFrame.TextRange.Text; }
+            catch { /*no notes*/ }
 
-                var notereader = new StringReader(note);
-                string line;
-                while ((line = notereader.ReadLine()) != null)
-                {
-                    if (line.StartsWith("OBS:")) {
-                        line = line.Substring(4).Trim();
-                        await HandleCommand(line);
-                    }
-                }
+            var noteReader = new StringReader(note);
+            string line;
+            while ((line = await noteReader.ReadLineAsync()) != null)
+            {
+                if (!line.StartsWith("OBS:")) continue;
+                line = line.Substring(4).Trim();
+                await HandleCommand(line);
             }
         }
 
-        static async Task HandleCommand(string command)
+        private static Task HandleCommand(string command)
         {
             switch (command)
             {
@@ -72,6 +71,8 @@ namespace obscontrol
                     catch (Exception ex) { Console.WriteLine($"  ERROR: {ex.Message.ToString()}"); }
                     break;
             }
+
+            return Task.CompletedTask;
         }
     }
 }
